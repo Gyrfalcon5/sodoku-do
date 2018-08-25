@@ -1,3 +1,5 @@
+// This file contains functions and struct definitions used in the main file,
+// sudoku.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,10 +7,12 @@
 #ifndef SUDOKU_METHODS
 #define SUDOKU_METHODS
 
+// Defines a boolean stand in to make things easier to think about
 #define TRUE 1
 #define FALSE 0
 typedef int BOOL;
 
+// Struct to hold all the data for a single square on the game board
 typedef struct _square
 {
 
@@ -21,8 +25,8 @@ typedef struct _square
 
 } SQUARE;
 
-SQUARE *newSquare(int value, int row, int column, int sector);
-
+// Struct to hold a full board of squares. At some point want to make this
+// scalable for smaller and larger boards.
 typedef struct _board
 {
 
@@ -30,7 +34,7 @@ typedef struct _board
 
 } BOARD;
 
-
+// Function for making a new square with known values
 SQUARE *newSquare(int value, int row, int column, int sector)
 {
     SQUARE *newSq;
@@ -48,7 +52,8 @@ SQUARE *newSquare(int value, int row, int column, int sector)
 
 }
 
-
+// Function for printing out the board to the console. Good for seeing if the
+// board is encoded or solved correctly.
 void printBoard(BOARD toPrint)
 {
     printf("\n");
@@ -71,6 +76,9 @@ void printBoard(BOARD toPrint)
     }
     printf("\n");
 }
+
+// The next three functions eliminate possibilites by row, column, and sector
+// respectively.
 
 // TODO also make this return if it changed anything
 void eliminateRows(BOARD toElim)
@@ -134,33 +142,6 @@ void eliminateCols(BOARD toElim)
     }
 }
 
-void printPossible(BOARD toPrint)
-{
-    printf("\n");
-    for(int colIter = 0 ; colIter < 9 ; colIter++)
-    {
-        for(int rowIter = 0 ; rowIter < 9 ; rowIter++)
-        {
-            int sum = 0;
-            for(int idx = 0 ; idx < 9 ; idx++)
-                sum += toPrint.squares[colIter][rowIter]->possible[idx];
-
-            if(toPrint.squares[colIter][rowIter]->value)
-                printf(" 1 ");
-            else
-                printf(" %d ", sum);
-            
-            if((((rowIter + 1) % 3) == 0) && (rowIter != 8))
-                printf("| ");
-        }
-        if((((colIter + 1) % 3) == 0) && (colIter != 8))
-            printf("\n------------------------------\n");
-        else
-            printf("\n");
-    }
-    printf("\n");
-}
-
 // TODO make it report if it changed anything so we can know if we can solve it or not
 void eliminateSectors(BOARD toElim)
 {
@@ -193,6 +174,37 @@ void eliminateSectors(BOARD toElim)
     }
 }
 
+// This function prints out how many possibilities there are for each square.
+// Not currently called but good for debugging.
+void printPossible(BOARD toPrint)
+{
+    printf("\n");
+    for(int colIter = 0 ; colIter < 9 ; colIter++)
+    {
+        for(int rowIter = 0 ; rowIter < 9 ; rowIter++)
+        {
+            int sum = 0;
+            for(int idx = 0 ; idx < 9 ; idx++)
+                sum += toPrint.squares[colIter][rowIter]->possible[idx];
+
+            if(toPrint.squares[colIter][rowIter]->value)
+                printf(" 1 ");
+            else
+                printf(" %d ", sum);
+            
+            if((((rowIter + 1) % 3) == 0) && (rowIter != 8))
+                printf("| ");
+        }
+        if((((colIter + 1) % 3) == 0) && (colIter != 8))
+            printf("\n------------------------------\n");
+        else
+            printf("\n");
+    }
+    printf("\n");
+}
+
+// This checks to see if the board is solved. Called to know when to end the
+// solving process
 int checkIfSolved(BOARD toCheck)
 {
     for(int colIter = 0 ; colIter < 9 ; colIter++)
@@ -206,7 +218,39 @@ int checkIfSolved(BOARD toCheck)
     return 1;
 }
 
+// This function fills in any squares that have only one possibility
+int fillSinglePossible(BOARD toFill)
+{
+    int numChanged = 0;
+    for(int colIter = 0 ; colIter < 9 ; colIter++)
+    {
+        for(int rowIter = 0 ; rowIter < 9 ; rowIter++)
+        {
+            int numPossible = 0;
+            for(int idx = 0 ; idx < 9 ; idx++)
+                numPossible += toFill.squares[colIter][rowIter]->possible[idx];
 
+            if(numPossible == 1)
+            {
+                for(int idx = 0 ; idx < 9 ; idx++)
+                {
+                    if(toFill.squares[colIter][rowIter]->possible[idx])
+                    {
+                        toFill.squares[colIter][rowIter]->value = idx + 1;
+                        numChanged++;
+                        break;
+                    }
+                }
+            }
+            else if(numPossible == 0)
+                return -1; // This is an error code, we made a mistake
 
+        }
+    }
+    return numChanged;
+}
+
+// TODO make a function that fills in squares that are the only possibility for
+// a number in their row/column/sector
 
 #endif

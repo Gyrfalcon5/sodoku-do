@@ -1,3 +1,6 @@
 # Compiled Code
 *.o
 *.out
+
+# Vim swap files
+*.swp

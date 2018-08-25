@@ -3,11 +3,10 @@
 int main()
 {
     
-    printf("here");
     BOARD gameBoard;
-    
+    // Pull in a puzzle from the testboard file and fill the gameboard
     // TODO make it solve all the puzzles in the folder 
-    FILE *fp = fopen("puzzles/testboard.txt", "r");
+    FILE *fp = fopen("puzzles/easy.txt", "r");
     int count = 0;
     while(!feof(fp) && count < 81)
     {
@@ -47,14 +46,24 @@ int main()
         count++;
         
     }
-    
+   
+    // This prints out the board and then iteratively solves the board using
+    // elimination and the single possibility rule
     printBoard(gameBoard);
-    // TODO make it solve the board
+    int errorCode = 0;
     while(!checkIfSolved(gameBoard))
     {
         eliminateRows(gameBoard);
         eliminateCols(gameBoard);
         eliminateSectors(gameBoard);
+        errorCode = fillSinglePossible(gameBoard);
+        if(errorCode <= 0)
+        {
+            printf("Can't find a solution with only possibility");
+            break;
+        }
     }
+    // Print the (hopefully solved) board
+    printBoard(gameBoard);
     return 0;
 }

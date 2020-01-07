@@ -1,2 +1,2 @@
 # sodoku-do
-C program that solves soduku puzzles.
+A python program that does Sudoku puzzles and lets you solve them too

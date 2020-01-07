@@ -4,3 +4,7 @@
 
 # Vim swap files
 *.swp
+
+__pycache__
+
+.fuse_hidden*
